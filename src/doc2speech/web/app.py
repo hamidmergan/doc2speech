@@ -140,9 +140,12 @@ def create_app(settings: Optional[config.Settings] = None,
 
         try:
             audio = speak(text, client=client, progress=report, **chosen)
-        except SpeechError as exc:
+        except Exception as exc:
+            # Every error ends the job. An error left running would block the
+            # page for every later text until the server is restarted.
             with lock:
-                job.state, job.error = "error", str(exc)
+                job.state = "error"
+                job.error = str(exc) or exc.__class__.__name__
             return
         with lock:
             job.state, job.audio, job.error = "done", audio, ""

@@ -119,6 +119,20 @@ def test_a_server_error_ends_the_job(client, server):
     assert client.get("/api/audio").status_code == 404
 
 
+def test_an_unexpected_error_ends_the_job_and_frees_the_page(client, monkeypatch):
+    """Any error ends the job, otherwise the page stays busy until a restart."""
+    def boom(text, **kwargs):
+        raise RuntimeError("something unexpected")
+
+    monkeypatch.setattr("doc2speech.web.app.speak", boom)
+    client.post("/api/speak", data={"text": "Hello."})
+    job = finish(client, timeout=2.0)
+    assert job["state"] == "error"
+    assert "something unexpected" in job["error"]
+    # the page takes the next text instead of answering 409 for ever
+    assert client.post("/api/speak", data={"text": "Hello again."}).status_code == 200
+
+
 def test_no_audio_before_the_first_job(client):
     assert client.get("/api/audio").status_code == 404
 
