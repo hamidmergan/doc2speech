@@ -5,6 +5,19 @@ from .errors import ModelError
 from .numbers import spell_numbers
 
 
+def status_of(answer) -> "int | None":
+    """The HTTP status code of a client error or of a response, if it has one.
+
+    The code is read off the object the openai client hands over, never parsed
+    out of a message text.
+    """
+    for holder in (answer, getattr(answer, "response", None)):
+        status = getattr(holder, "status_code", None)
+        if isinstance(status, int):
+            return status
+    return None
+
+
 def normalize_base_url(url: str) -> str:
     """Accept a server URL with or without the /v1 suffix.
 
@@ -50,11 +63,15 @@ def synthesize_chunk(client, settings: Settings, text: str) -> bytes:
     try:
         response = client.audio.speech.create(**payload)
     except Exception as exc:
-        raise ModelError(f"Request to {settings.base_url} failed: {exc}")
+        raise ModelError(
+            f"Request to {settings.base_url} failed: {exc}", status=status_of(exc)
+        )
     try:
         audio = response.content
     except AttributeError:
-        raise ModelError("The server response has an unexpected format.")
+        raise ModelError(
+            "The server response has an unexpected format.", status=status_of(response)
+        )
     if not audio:
-        raise ModelError("The server returned no audio.")
+        raise ModelError("The server returned no audio.", status=status_of(response))
     return audio

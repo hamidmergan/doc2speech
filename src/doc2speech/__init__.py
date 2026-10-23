@@ -3,6 +3,7 @@ from .chunking import split_text
 from .config import Settings, resolve
 from .core import file_audio, preview, speak, speak_file
 from .errors import (
+    RETRY_STATUS,
     AudioError,
     ConfigError,
     EmptyTextError,
@@ -39,5 +40,6 @@ __all__ = [
     "UnsupportedFileError",
     "ModelError",
     "AudioError",
+    "RETRY_STATUS",
     "__version__",
 ]
