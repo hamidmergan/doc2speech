@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "doc2speech"
+version = "0.1.0"
+description = "Read text and documents aloud with any OpenAI-compatible text-to-speech server"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Hamid Mergan" }]
+keywords = ["tts", "text-to-speech", "speech", "audio", "mp3", "openai", "ollama", "accessibility"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "Topic :: Text Processing",
+    "Typing :: Typed",
+]
+dependencies = [
+    "openai>=1.30",
+    "num2words>=0.5.13",
+    "python-docx>=1.1",
+    "pypdfium2>=4.30",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+dev = ["pytest>=7", "build", "twine"]
+
+[project.urls]
+Homepage = "https://github.com/hamidmergan/doc2speech"
+Source = "https://github.com/hamidmergan/doc2speech"
+Issues = "https://github.com/hamidmergan/doc2speech/issues"
+Changelog = "https://github.com/hamidmergan/doc2speech/blob/main/CHANGELOG.md"
+
+[project.scripts]
+doc2speech = "doc2speech.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+doc2speech = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
