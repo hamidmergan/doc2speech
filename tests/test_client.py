@@ -16,6 +16,14 @@ def test_request_goes_to_audio_speech(server, conf):
     assert body["response_format"] == "mp3"
 
 
+@pytest.mark.parametrize("suffix", ["", "/", "/v1", "/v1/"])
+def test_a_base_url_with_or_without_v1_reaches_the_endpoint(server, conf, suffix):
+    """Many servers are copied from a README without the /v1 part."""
+    root = conf["base_url"][: -len("/v1")]
+    speak("Hello.", **{**conf, "base_url": root + suffix})
+    assert server.requests[0]["path"] == "/v1/audio/speech"
+
+
 def test_returns_the_audio_bytes(server, conf):
     from conftest import SAMPLES
 

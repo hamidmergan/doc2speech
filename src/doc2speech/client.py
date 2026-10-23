@@ -5,11 +5,23 @@ from .errors import ModelError
 from .numbers import spell_numbers
 
 
+def normalize_base_url(url: str) -> str:
+    """Accept a server URL with or without the /v1 suffix.
+
+    Both http://host:8880 and http://host:8880/v1 end up calling
+    http://host:8880/v1/audio/speech.
+    """
+    cleaned = (url or "").rstrip("/")
+    if cleaned.endswith("/v1"):
+        cleaned = cleaned[: -len("/v1")]
+    return cleaned + "/v1"
+
+
 def make_client(settings: Settings):
     from openai import OpenAI
 
     return OpenAI(
-        base_url=settings.base_url,
+        base_url=normalize_base_url(settings.base_url),
         api_key=settings.api_key,
         timeout=settings.timeout,
         max_retries=settings.max_retries,

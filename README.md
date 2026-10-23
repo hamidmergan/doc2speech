@@ -139,7 +139,7 @@ Order: argument, then environment variable, then default.
 | `timeout` / `--timeout` | `DOC2SPEECH_TIMEOUT` | 90 seconds |
 | `max_retries` | `DOC2SPEECH_MAX_RETRIES` | 2 |
 
-The voice has no default, because voice names differ from server to server. There is no default base URL or model either, so nothing is sent anywhere you did not name.
+The voice has no default, because voice names differ from server to server. There is no default base URL or model either, so nothing is sent anywhere you did not name. The base URL works with or without the trailing `/v1`, both reach the same endpoint.
 
 Speed is only sent when you set it. Some servers add an audible echo to a slowed-down voice, so the request carries no speed field by default.
 
