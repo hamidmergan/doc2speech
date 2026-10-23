@@ -87,6 +87,58 @@ def test_voice_from_environment(server, tmp_path, monkeypatch):
     assert server.requests[0]["body"]["voice"] == "nova"
 
 
+def test_max_retries_flag_turns_the_retries_off(server, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    server.fail_indexes = {1}
+    assert main(["--text", "Hi.", "--max-retries", "0", *args(server)]) == 1
+    assert len(server.requests) == 1
+    assert os.listdir(tmp_path) == []
+
+
+def test_max_chars_per_chunk_flag_splits_the_text(server, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("doc2speech.core.join", lambda parts, fmt: b"".join(parts))
+    monkeypatch.setattr("doc2speech.core.ffmpeg_path", lambda: "ffmpeg")
+    text = "One short sentence here. " * 8
+    assert main(["--text", text, "--max-chars-per-chunk", "60", *args(server)]) == 0
+    assert len(server.requests) > 1
+    assert all(len(sent) <= 60 for sent in server.inputs)
+
+
+def test_max_chars_flag_rejects_a_long_text(server, capsys):
+    assert main(["--text", "a" * 50, "--max-chars", "10", *args(server)]) == 1
+    assert "Text too long" in capsys.readouterr().err
+    assert server.requests == []
+
+
+def test_concurrency_and_timeout_flags_reach_the_settings(server, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    seen = {}
+
+    def record(settings):
+        from doc2speech.client import make_client
+
+        seen["settings"] = settings
+        return make_client(settings)
+
+    monkeypatch.setattr("doc2speech.core.make_client", record)
+    assert main(["--text", "Hi.", "--concurrency", "2", "--timeout", "5", *args(server)]) == 0
+    assert seen["settings"].concurrency == 2
+    assert seen["settings"].timeout == 5
+
+
+def test_no_file_is_written_when_a_later_part_fails(server, tmp_path, monkeypatch, capsys):
+    """A long text that breaks halfway leaves nothing half-finished behind."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("doc2speech.core.join", lambda parts, fmt: b"".join(parts))
+    monkeypatch.setattr("doc2speech.core.ffmpeg_path", lambda: "ffmpeg")
+    server.fail_indexes = {3}
+    text = "This is one sentence of a longer text. " * 40
+    assert main(["--text", text, "--max-retries", "0", *args(server)]) == 1
+    assert "Error:" in capsys.readouterr().err
+    assert os.listdir(tmp_path) == []
+
+
 def test_both_inputs(server, tmp_path, capsys):
     source = tmp_path / "a.txt"
     source.write_text("x")

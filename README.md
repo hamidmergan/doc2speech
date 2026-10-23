@@ -137,7 +137,7 @@ Order: argument, then environment variable, then default.
 | `max_chars` / `--max-chars` | `DOC2SPEECH_MAX_CHARS` | 100000 characters |
 | `concurrency` / `--concurrency` | `DOC2SPEECH_CONCURRENCY` | 4 |
 | `timeout` / `--timeout` | `DOC2SPEECH_TIMEOUT` | 90 seconds |
-| `max_retries` | `DOC2SPEECH_MAX_RETRIES` | 2 |
+| `max_retries` / `--max-retries` | `DOC2SPEECH_MAX_RETRIES` | 2 extra attempts |
 
 The voice has no default, because voice names differ from server to server. There is no default base URL or model either, so nothing is sent anywhere you did not name. The base URL works with or without the trailing `/v1`, both reach the same endpoint.
 

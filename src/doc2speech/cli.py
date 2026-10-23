@@ -52,6 +52,7 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--max-chars", type=int, help="Longest accepted text in characters (default 100000)")
     p.add_argument("--concurrency", type=int, help="Requests at the same time (default 4)")
     p.add_argument("--timeout", type=float, help="Seconds per request (default 90)")
+    p.add_argument("--max-retries", type=int, help="Extra attempts after a failed request (default 2)")
     p.add_argument("--version", action="version", version=f"doc2speech {__version__}")
     return p
 
@@ -137,6 +138,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         max_chars=args.max_chars,
         concurrency=args.concurrency,
         timeout=args.timeout,
+        max_retries=args.max_retries,
     )
     to_stdout = args.output == "-"
 
