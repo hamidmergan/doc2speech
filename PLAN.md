@@ -27,10 +27,11 @@ Shape: Python library with a thin CLI and a small web UI. pip package `doc2speec
 - [x] 1 Core: client, chunking, number words, joining with ffmpeg (concat demuxer), text extraction, `config.py`, `errors.py`.
 - [x] 2 API + CLI: `speak`, `speak_file`, `split_text`, CLI with `--voice`, `--text`, `--speed`, `--format`.
 - [x] 3 Tests with a fake server: splitting, number words (de and en), joining, CLI, missing configuration.
-- [ ] 4 README, CHANGELOG 0.1.0, local smoke test with a real speech model.
+- [x] 4 README, CHANGELOG 0.1.0, local smoke test with a real speech model.
 - [ ] 5 English sweep, acceptance greps.
 - [ ] 6 Web UI (`doc2speech serve`) and Docker.
 
 ## Open
 
-- Nothing yet.
+- Smoke test with a real speech model: a 1,248 character text went out in four parts and came back as one 86 second mp3. Preview and wav also work.
+- Possible extras later: speech providers with their own protocol instead of the OpenAI-compatible endpoint.
