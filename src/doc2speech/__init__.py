@@ -1,5 +1,7 @@
+from .audio import SUFFIXES
 from .chunking import split_text
-from .core import preview, speak, speak_file
+from .config import Settings, resolve
+from .core import file_audio, preview, speak, speak_file
 from .errors import (
     AudioError,
     ConfigError,
@@ -9,8 +11,9 @@ from .errors import (
     SpeechError,
     UnsupportedFileError,
 )
-from .extract import extract_text
+from .extract import extract_bytes, extract_text, supported_suffixes
 from .numbers import spell_numbers
+from .preview import preview_text
 
 __version__ = "0.1.0"
 
@@ -21,6 +24,14 @@ __all__ = [
     "preview",
     "extract_text",
     "spell_numbers",
+    # helpers other tools build on
+    "file_audio",
+    "extract_bytes",
+    "supported_suffixes",
+    "preview_text",
+    "Settings",
+    "resolve",
+    "SUFFIXES",
     "SpeechError",
     "ConfigError",
     "LimitError",

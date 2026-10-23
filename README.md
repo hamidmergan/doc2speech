@@ -116,6 +116,8 @@ The public API is small and stable, so other tools can build on it:
 | `extract_text(path)` | the text of a file as `str` |
 | `spell_numbers(text, language)` | the text with numbers as words |
 
+A few helpers are exported for tools that build on doc2speech: `file_audio(path, settings)` voices an already resolved file run, `extract_bytes(name, data)` reads an upload that is only in memory, `supported_suffixes()` lists the readable extensions, `preview_text(language)` gives the example sentence, `SUFFIXES` maps a format to its file extension, and `Settings` together with `resolve(**settings)` builds the settings themselves.
+
 `split_text` returns exactly the parts `speak` would send. Without `max_chars` it takes the limit from `DOC2SPEECH_MAX_CHARS_PER_CHUNK`, otherwise 400, so a part count shown before a run matches the run.
 
 Every setting from the table below can be passed to `speak`, `speak_file` and `preview` as a keyword argument. Errors are raised as subclasses of `SpeechError`: `ConfigError`, `LimitError`, `EmptyTextError`, `UnsupportedFileError`, `ModelError` and `AudioError`.
