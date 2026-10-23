@@ -27,6 +27,14 @@ Shape: Python library with a thin CLI and a small web UI. pip package `doc2speec
 - A dot in an English number is read as a decimal point, not as a thousands separator. The source stripped a dot from patterns like `3.141` and spoke "three thousand, one hundred and forty-one". Numbers are only spelled out for English (`_MEASURED_LANGUAGES = {"en"}`), and in English a dot is the decimal point, so that branch could only ever corrupt a number. The comma branch still covers English thousands (`1,000`).
 - A failed request is tried again twice (`max_retries` 2). The source made exactly one attempt per part. A long text goes out in hundreds of parts, and one dropped connection would throw away the whole run, so the default allows two more attempts. `--max-retries 0` or `DOC2SPEECH_MAX_RETRIES=0` restores the single attempt, which is what a paid endpoint may want.
 
+## Known properties
+
+Measured, understood and kept as they are.
+
+- `speak_file` overwrites an existing audio file, the CLI adds a number to a name it generated itself (`notes (1).mp3`). Two entry points, two rules: a library call writes where it is told, a command line run must not destroy an earlier recording by accident. Both are written down in the docstring and in the README.
+- The search for a sentence end takes the first punctuation kind that is found in the window, not the one closest to the limit. A `". "` early in the window wins over a `"? "` late in it, so some parts end earlier than they would have to and a text with mixed punctuation costs a few more requests. Copied from the source and kept.
+- A comma decimal is mangled for English: "A score of 3,5 points." becomes "A score of three,5 points.", because the number pattern matches the leading digit and the lookbehind then blocks the second one. English writes decimals with a dot, so this only shows up in text that is not English, and there nothing is spelled out at all. Kept.
+
 ## Checklist
 
 - [x] 0 Scaffold: repo, LICENSE (MIT), pyproject, package, tests, CI, PLAN.md, README skeleton, ffmpeg check.

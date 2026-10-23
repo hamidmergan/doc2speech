@@ -105,6 +105,27 @@ written = speak_file(
 print(written)  # notes.mp3
 ```
 
+`speak_file` overwrites an existing audio file, with a name you give and with the generated one. The CLI is more careful here: a name it generates itself never overwrites, it adds a number instead (`notes (1).mp3`). Check the path yourself if the library call needs the same rule.
+
+`speak`, `speak_file` and `preview` also take `client=`, a ready-made OpenAI client, for example to share one connection pool across many calls:
+
+```python
+from openai import OpenAI
+
+from doc2speech import speak
+
+client = OpenAI(base_url="http://localhost:11434/v1", api_key="none")
+audio = speak(
+    "Hello.",
+    voice="alloy",
+    base_url="http://localhost:11434/v1",
+    model="your-speech-model",
+    client=client,
+)
+```
+
+A client given this way is used as it is. `base_url`, `api_key`, `timeout` and `max_retries` from the settings are then ignored, the client you built decides them. `voice`, `model`, `format`, `speed` and `language` still apply, and `base_url`, `model` and `voice` are still required, because the settings are resolved before the client is used.
+
 The public API is small and stable, so other tools can build on it:
 
 | Function | Returns |

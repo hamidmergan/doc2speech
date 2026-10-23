@@ -102,7 +102,10 @@ def speak_file(
     """Read a text file aloud and write the audio to output.
 
     Without output the audio goes next to the input, with the format's
-    extension (notes.md becomes notes.mp3). Returns the written path.
+    extension (notes.md becomes notes.mp3). An existing file at that path is
+    overwritten, with a given name as well as with a generated one. The CLI
+    is more careful and adds a number to a name it generated itself
+    (notes (1).mp3). Returns the written path.
     """
     resolved = config.resolve(
         voice=voice, base_url=base_url, model=model, api_key=api_key, **settings
