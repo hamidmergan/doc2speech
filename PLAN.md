@@ -28,7 +28,7 @@ Shape: Python library with a thin CLI and a small web UI. pip package `doc2speec
 - [x] 2 API + CLI: `speak`, `speak_file`, `split_text`, CLI with `--voice`, `--text`, `--speed`, `--format`.
 - [x] 3 Tests with a fake server: splitting, number words (de and en), joining, CLI, missing configuration.
 - [x] 4 README, CHANGELOG 0.1.0, local smoke test with a real speech model.
-- [ ] 5 English sweep, acceptance greps.
+- [x] 5 English sweep, acceptance greps.
 - [ ] 6 Web UI (`doc2speech serve`) and Docker.
 
 ## Open
