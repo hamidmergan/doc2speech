@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `speak`, `speak_file`, `preview`, `split_text`, `extract_text` and `spell_numbers` as the public Python API.
-- CLI `doc2speech` with `--text`, `--preview`, `-o`, `--voice`, `--speed`, `--format` and `--language`.
+- `speak`, `speak_file`, `preview`, `split_text`, `extract_text` and `spell_numbers` as the public Python API, plus the helpers `file_audio`, `extract_bytes`, `supported_suffixes`, `preview_text`, `Settings`, `resolve` and `SUFFIXES`.
+- CLI `doc2speech` with `--text`, `--preview`, `-o`, `--voice`, `--speed`, `--format`, `--language` and `--max-retries`.
 - Splitting of long texts at sentence boundaries, then at word boundaries, with a hard cut as the last resort.
 - Parts are spoken in parallel and joined losslessly with the ffmpeg concat demuxer, in mp3, wav and opus.
 - English numbers are spelled out as words before speaking. URLs, email addresses and digits inside words stay untouched.
