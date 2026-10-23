@@ -25,6 +25,7 @@ Shape: Python library with a thin CLI and a small web UI. pip package `doc2speec
 ## Deliberate deviations from the source
 
 - A dot in an English number is read as a decimal point, not as a thousands separator. The source stripped a dot from patterns like `3.141` and spoke "three thousand, one hundred and forty-one". Numbers are only spelled out for English (`_MEASURED_LANGUAGES = {"en"}`), and in English a dot is the decimal point, so that branch could only ever corrupt a number. The comma branch still covers English thousands (`1,000`).
+- A failed request is tried again twice (`max_retries` 2). The source made exactly one attempt per part. A long text goes out in hundreds of parts, and one dropped connection would throw away the whole run, so the default allows two more attempts. `--max-retries 0` or `DOC2SPEECH_MAX_RETRIES=0` restores the single attempt, which is what a paid endpoint may want.
 
 ## Checklist
 

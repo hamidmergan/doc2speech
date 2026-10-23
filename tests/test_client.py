@@ -74,6 +74,23 @@ def test_server_error_becomes_model_error(server, conf):
         speak("Hello.", **conf)
 
 
+def test_a_failing_request_is_tried_again(server, conf):
+    """The default of two extra attempts carries a text over a short hiccup."""
+    from conftest import SAMPLES
+
+    options = {k: v for k, v in conf.items() if k != "max_retries"}
+    server.fail_indexes = {1, 2}
+    assert speak("Hello.", **options) == SAMPLES["mp3"]
+    assert len(server.requests) == 3
+
+
+def test_retries_can_be_turned_off(server, conf):
+    server.fail_indexes = {1}
+    with pytest.raises(ModelError):
+        speak("Hello.", **conf)  # the fixture pins max_retries to 0
+    assert len(server.requests) == 1
+
+
 def test_unreachable_server_becomes_model_error():
     with pytest.raises(ModelError):
         speak("Hello.", base_url="http://127.0.0.1:9/v1", model="m", voice="v", max_retries=0, timeout=2)

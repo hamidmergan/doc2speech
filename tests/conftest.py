@@ -48,6 +48,8 @@ class FakeServer:
     def __init__(self):
         self.requests = []
         self.fail = False
+        # Request numbers (1 for the first one) that are answered with a 500.
+        self.fail_indexes = set()
         self.lock = threading.Lock()
         outer = self
 
@@ -64,7 +66,9 @@ class FakeServer:
                         "headers": {k.lower(): v for k, v in self.headers.items()},
                         "body": body,
                     })
-                if outer.fail or not self.path.endswith("/audio/speech"):
+                    number = len(outer.requests)
+                    broken = outer.fail or number in outer.fail_indexes
+                if broken or not self.path.endswith("/audio/speech"):
                     data = b'{"error": {"message": "broken"}}'
                     self.send_response(500)
                     self.send_header("Content-Type", "application/json")
