@@ -143,6 +143,31 @@ A few helpers are exported for tools that build on doc2speech: `file_audio(path,
 
 Every setting from the table below can be passed to `speak`, `speak_file` and `preview` as a keyword argument. Errors are raised as subclasses of `SpeechError`: `ConfigError`, `LimitError`, `EmptyTextError`, `UnsupportedFileError`, `ModelError` and `AudioError`.
 
+`ModelError` says what the server answered. `status` is the HTTP status code as an `int`, or `None` when the request never reached an answer, for example on a timeout or a refused connection. `transient` says whether sending the same request again can still succeed: a timeout or a connection failure counts as transient, and so do 408, 429 and every 5xx. Every other answer is final, the request itself has to change before it can work. Both are there so a tool built on doc2speech can decide without reading the message text.
+
+```python
+import time
+
+from doc2speech import ModelError, speak
+
+for attempt in range(4):
+    try:
+        audio = speak(
+            "Hello.",
+            voice="alloy",
+            base_url="http://localhost:11434/v1",
+            model="your-speech-model",
+        )
+        break
+    except ModelError as exc:
+        if not exc.transient or attempt == 3:
+            raise
+        print(f"server said {exc.status}, trying again")
+        time.sleep(2 ** attempt)
+```
+
+`RETRY_STATUS` is exported too, the set of non 5xx codes that count as transient, in case a caller wants to show them.
+
 ### Settings
 
 Order: argument, then environment variable, then default.

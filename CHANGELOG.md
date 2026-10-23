@@ -18,5 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Settings from argument, environment variable or default, for any OpenAI-compatible `/audio/speech` server.
 - Web page with `doc2speech serve`: text or document in, audio player and download out, with a voice preview.
 - `Dockerfile` and `docker-compose.yml`, the image brings ffmpeg and starts the web page on port 8000.
+- `ModelError` carries the HTTP status code in `status` and answers `transient`, so a caller decides about a retry without reading the message text. 408, 429, every 5xx, a timeout and a connection failure are transient, every other answer is final. The set `RETRY_STATUS` is exported as well.
 
 [0.1.0]: https://github.com/hamidmergan/doc2speech/releases/tag/v0.1.0
