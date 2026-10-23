@@ -9,6 +9,7 @@ from doc2speech import (
     AudioError,
     EmptyTextError,
     LimitError,
+    ModelError,
     UnsupportedFileError,
     extract_text,
     speak,
@@ -97,6 +98,34 @@ def test_broken_parts_raise_audio_error(monkeypatch, conf, server):
     monkeypatch.setattr("doc2speech.core.synthesize_chunk", lambda c, s, t: b"not audio")
     with pytest.raises(AudioError, match="could not join"):
         speak(LONG, **conf)
+
+
+def test_one_failing_part_fails_the_whole_text(server, conf, monkeypatch):
+    """A broken part in the middle surfaces, it is not quietly dropped."""
+    monkeypatch.setattr("doc2speech.core.join", lambda parts, fmt: b"".join(parts))
+    monkeypatch.setattr("doc2speech.core.ffmpeg_path", lambda: "ffmpeg")
+    server.fail_indexes = {3}
+    with pytest.raises(ModelError, match="Request to"):
+        speak(LONG, **conf)
+
+
+def test_several_parts_in_one_request_at_a_time(server, conf, monkeypatch):
+    """concurrency 1 takes the sequential path and keeps the order."""
+    seen = {}
+
+    def fake_join(parts, fmt):
+        seen["parts"] = parts
+        return b"joined"
+
+    monkeypatch.setattr("doc2speech.core.join", fake_join)
+    monkeypatch.setattr("doc2speech.core.ffmpeg_path", lambda: "ffmpeg")
+    monkeypatch.setattr(
+        "doc2speech.core.synthesize_chunk",
+        lambda client, settings, text: text.encode(),
+    )
+    assert speak(LONG, concurrency=1, **conf) == b"joined"
+    assert len(seen["parts"]) == 4
+    assert b"".join(seen["parts"]).decode() == LONG.strip()
 
 
 def test_an_ffmpeg_timeout_becomes_an_audio_error(monkeypatch, conf, server):

@@ -31,16 +31,15 @@ def test_text_without_digits_goes_out_unchanged(server, conf):
     assert server.inputs == ["Hello everyone and welcome."]
 
 
-def test_every_part_is_spelled_out(server, conf, no_ffmpeg):
+def test_every_part_is_spelled_out(server, conf, monkeypatch):
     """Each part follows the same rule, not only the first."""
-    import pytest
-
-    from doc2speech import AudioError
-
-    # two parts need ffmpeg, without it the error comes before any request
-    with pytest.raises(AudioError):
-        speak("It was 47. " * 60, language="EN", **conf)
-    assert server.requests == []
+    monkeypatch.setattr("doc2speech.core.join", lambda parts, fmt: b"".join(parts))
+    monkeypatch.setattr("doc2speech.core.ffmpeg_path", lambda: "ffmpeg")
+    speak("Chapter 1 has 23 pages. " * 60, language="EN", **conf)
+    assert len(server.requests) == 4
+    for sent in server.inputs:
+        assert "twenty-three" in sent
+        assert not any(ch.isdigit() for ch in sent), sent
 
 
 def test_preview_sends_no_speed_and_no_spelling(server, conf):
