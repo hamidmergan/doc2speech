@@ -21,11 +21,19 @@ If you run your own model, your documents stay on your own network. Nothing leav
 
 ## Installation
 
+doc2speech is installed from GitHub:
+
 ```bash
-pip install doc2speech
+pip install git+https://github.com/hamidmergan/doc2speech.git
 ```
 
-Alternatively, you can install it from the source:
+With the web UI:
+
+```bash
+pip install "doc2speech[ui] @ git+https://github.com/hamidmergan/doc2speech.git"
+```
+
+Alternatively, you can install it from a local copy (`pip install ".[ui]"` for the web UI):
 
 ```bash
 git clone https://github.com/hamidmergan/doc2speech.git
@@ -200,7 +208,7 @@ If a limit is exceeded, the text is rejected with a message naming the limit and
 A small page in the browser, with the same voices and settings as the CLI:
 
 ```bash
-pip install "doc2speech[ui]"
+pip install "doc2speech[ui] @ git+https://github.com/hamidmergan/doc2speech.git"
 doc2speech serve
 ```
 

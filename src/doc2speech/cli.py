@@ -13,7 +13,8 @@ LOOPBACK = ("127.0.0.1", "localhost", "::1")
 
 UI_HINT = (
     "The web page needs the extra packages. Install them with "
-    "'pip install \"doc2speech[ui]\"'."
+    "'pip install \"doc2speech[ui] @ "
+    "git+https://github.com/hamidmergan/doc2speech.git\"'."
 )
 
 NO_LOGIN = (
