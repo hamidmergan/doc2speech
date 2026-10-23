@@ -8,14 +8,14 @@ Shape: Python library with a thin CLI and a small web UI. pip package `doc2speec
 
 - ffmpeg is a system requirement. It is checked before the first request whenever a text needs more than one part.
 - Parts are joined with the ffmpeg concat demuxer and `-c copy`, no re-encoding. Tested for mp3, wav and opus. A single part is returned as it is.
-- Defaults: 400 characters per request, 100,000 characters per text, 4 requests at once, 90 seconds per request, format mp3.
+- Defaults: 400 characters per request, 100,000 characters per text, 4 requests at once, 90 seconds per request, 2 extra attempts after a failed request, format mp3.
 - Splitting looks for a sentence end in the last 40 percent of the limit, then for a word boundary, then cuts hard. Joining the parts gives back the text exactly.
 - Joined mp3 keeps a frame of encoder padding per part, a few hundredths of a second. Lossless joining cannot avoid it and it is not audible.
 - Numbers are spelled out for English only (`language` en, en-US, ...). Other languages stay unchanged, because the wrong reading of digits was only measured for English. Without a language nothing is changed.
 - Speed is optional and only sent when set. Without it the request carries no speed field, because some servers slow a voice down with an audible echo.
 - Text files: .txt, .md, .docx, .pdf (text layer), plus .tex, .srt and .vtt which need no extra dependency. Markdown, LaTeX and subtitle markup is stripped before speaking.
 - `speak`, `speak_file` and `file_audio` take an optional `progress(done, total)` callback. The web page uses it to show which part is being spoken.
-- Public API: `speak(text, voice, base_url, model, api_key=None, **settings) -> bytes`, `speak_file(path, output=None, voice, ...) -> Path`, `split_text(text, max_chars=None) -> list`, plus `preview`, `extract_text`, `spell_numbers`. Further settings are keyword arguments.
+- Public API: `speak(text, voice, base_url, model, api_key=None, **settings) -> bytes`, `speak_file(path, output=None, voice, ...) -> Path`, `split_text(text, max_chars=None) -> list`, plus `preview`, `extract_text`, `spell_numbers`. Further settings are keyword arguments. Exported for the tools that build on this one: `file_audio`, `extract_bytes`, `supported_suffixes`, `preview_text`, `Settings`, `resolve`, `SUFFIXES`.
 - The voice has no default. It is required by argument, `--voice` or `DOC2SPEECH_VOICE`, together with base_url and model.
 - CLI: a file or `--text`, not both. `--preview` speaks the example sentence. `-o -` writes to stdout. Generated output names never overwrite (`notes (1).mp3`), an explicit `-o` does. Exit code 2 for configuration errors, 1 for other errors.
 - Limits messages follow the original wording: "Text too long (... characters). Please shorten (max ... characters)." and "Document too long ... Please split ...".
@@ -44,6 +44,7 @@ Measured, understood and kept as they are.
 - [x] 4 README, CHANGELOG 0.1.0, local smoke test with a real speech model.
 - [x] 5 English sweep, acceptance greps.
 - [x] 6 Web UI (`doc2speech serve`) and Docker.
+- [x] 7 Review fixes: English decimals, error contract, base URL with or without `/v1`, `split_text` limit from the environment, `--max-retries`, exported helpers, missing tests.
 
 ## Open
 
