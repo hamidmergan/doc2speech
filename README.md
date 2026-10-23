@@ -145,6 +145,50 @@ With `language` set to English, numbers are spelled out before speaking (`47` be
 
 If a limit is exceeded, the text is rejected with a message naming the limit and the setting. Nothing is silently truncated.
 
+### Web UI
+
+A small page in the browser, with the same voices and settings as the CLI:
+
+```bash
+pip install "doc2speech[ui]"
+doc2speech serve
+```
+
+Then open http://127.0.0.1:8000. Paste a text or drop a document, pick a voice, press Create audio. The result plays on the page and can be downloaded. Preview voice speaks a short example sentence so you can compare voices first.
+
+Base URL, model, voice and the rest come from the environment and can be changed in the fields of the page. Empty fields keep the value the server was started with.
+
+The page has no login. It listens on 127.0.0.1 by default, so only your own machine can reach it. Use `--host 0.0.0.0` only in a network you trust, for example inside Docker behind your own reverse proxy.
+
+```bash
+doc2speech serve --host 0.0.0.0 --port 8000 --voice alloy
+```
+
+### Docker
+
+The image brings ffmpeg and starts the web page:
+
+```bash
+docker compose up
+```
+
+The page is then on http://127.0.0.1:8000. Settings come from `DOC2SPEECH_*` environment variables, `docker-compose.yml` lists them all:
+
+```bash
+DOC2SPEECH_BASE_URL=http://host.docker.internal:11434/v1 \
+DOC2SPEECH_MODEL=your-speech-model \
+DOC2SPEECH_VOICE=alloy \
+docker compose up
+```
+
+A speech server running on your own machine is reachable from inside the container as `host.docker.internal`, not as `localhost`. If port 8000 is taken, set `DOC2SPEECH_PORT`.
+
+The CLI works in the image too:
+
+```bash
+docker compose run --rm doc2speech doc2speech --text "Hello." --voice alloy -o -
+```
+
 ## Limitations
 
 Quality depends on the chosen model and voice. Check important results.

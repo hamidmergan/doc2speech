@@ -9,11 +9,25 @@ from .config import FORMATS, resolve
 from .core import file_audio, preview, speak
 from .errors import ConfigError, SpeechError
 
+LOOPBACK = ("127.0.0.1", "localhost", "::1")
+
+UI_HINT = (
+    "The web page needs the extra packages. Install them with "
+    "'pip install \"doc2speech[ui]\"'."
+)
+
+NO_LOGIN = (
+    "Warning: the page has no login. On an address other than 127.0.0.1 "
+    "everyone who can reach it can use your speech server."
+)
+
 
 def _parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="doc2speech",
         description="Read text or a text file aloud with an OpenAI-compatible text-to-speech server.",
+        epilog="Example: doc2speech notes.md --voice alloy. "
+        "Run 'doc2speech serve' for the web page.",
     )
     p.add_argument("file", nargs="?", help="Text file: .txt, .md, .docx, .pdf, .tex, .srt or .vtt")
     p.add_argument("--text", help="Text to read aloud instead of a file")
@@ -42,6 +56,48 @@ def _parser() -> argparse.ArgumentParser:
     return p
 
 
+def _serve_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="doc2speech serve", description="Start the local web page.")
+    p.add_argument("--host", default="127.0.0.1", help="Default: 127.0.0.1 (this computer only)")
+    p.add_argument("--port", type=int, default=8000)
+    p.add_argument("--voice", help="Voice the page starts with")
+    p.add_argument("--speed", type=float, help="Speaking speed the page starts with")
+    p.add_argument("--format", choices=FORMATS, help="Audio format the page starts with")
+    p.add_argument("--language", help="Language the page starts with")
+    p.add_argument("--base-url", help="URL of the OpenAI-compatible server")
+    p.add_argument("--model", help="Name of the text-to-speech model")
+    p.add_argument("--api-key", help="API key, if the server requires one")
+    return p
+
+
+def _serve(argv: List[str]) -> int:
+    args = _serve_parser().parse_args(argv)
+    try:
+        import uvicorn
+
+        from .web.app import create_app
+    except ImportError:
+        print(UI_HINT, file=sys.stderr)
+        return 2
+    # The page works without settings too, they can be typed into its fields.
+    try:
+        settings = resolve(
+            voice=args.voice, base_url=args.base_url, model=args.model, api_key=args.api_key,
+            speed=args.speed, format=args.format, language=args.language,
+        )
+    except ConfigError:
+        settings = None
+    app = create_app(
+        settings,
+        # on loopback, only accept our own host names, so other web pages cannot reach it via DNS rebinding
+        allowed_hosts=list(LOOPBACK) if args.host in LOOPBACK else None,
+    )
+    if args.host not in LOOPBACK:
+        print(NO_LOGIN, file=sys.stderr)
+    uvicorn.run(app, host=args.host, port=args.port)
+    return 0
+
+
 def _free(path: Path) -> Path:
     """Return path, or 'name (1).mp3', 'name (2).mp3', ... if it already exists."""
     candidate, n = path, 1
@@ -52,6 +108,9 @@ def _free(path: Path) -> Path:
 
 
 def main(argv: Optional[List[str]] = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "serve":
+        return _serve(argv[1:])
     args = _parser().parse_args(argv)
     has_file = bool(args.file)
     has_text = args.text is not None

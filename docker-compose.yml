@@ -1,0 +1,23 @@
+services:
+  doc2speech:
+    build: .
+    ports:
+      # Set DOC2SPEECH_PORT if 8000 is already taken on your machine.
+      - "${DOC2SPEECH_PORT:-8000}:8000"
+    environment:
+      # URL of your OpenAI-compatible server. From inside the container, a server
+      # on the host is reachable as host.docker.internal, not as localhost.
+      DOC2SPEECH_BASE_URL: ${DOC2SPEECH_BASE_URL:-}
+      DOC2SPEECH_MODEL: ${DOC2SPEECH_MODEL:-}
+      DOC2SPEECH_VOICE: ${DOC2SPEECH_VOICE:-}
+      # Optional, many self-hosted servers need no key.
+      DOC2SPEECH_API_KEY: ${DOC2SPEECH_API_KEY:-}
+      # Optional defaults of the page.
+      DOC2SPEECH_FORMAT: ${DOC2SPEECH_FORMAT:-}
+      DOC2SPEECH_LANGUAGE: ${DOC2SPEECH_LANGUAGE:-}
+      DOC2SPEECH_SPEED: ${DOC2SPEECH_SPEED:-}
+      DOC2SPEECH_MAX_CHARS_PER_CHUNK: ${DOC2SPEECH_MAX_CHARS_PER_CHUNK:-}
+      DOC2SPEECH_MAX_CHARS: ${DOC2SPEECH_MAX_CHARS:-}
+      DOC2SPEECH_CONCURRENCY: ${DOC2SPEECH_CONCURRENCY:-}
+      DOC2SPEECH_TIMEOUT: ${DOC2SPEECH_TIMEOUT:-}
+    restart: unless-stopped

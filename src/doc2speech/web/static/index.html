@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>doc2speech</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>Text to audio</h1>
+    <span class="muted">Have texts and documents read aloud with natural-sounding voices.</span>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Voice</h2>
+      <div class="options">
+        <label class="wide">Voice
+          <input type="text" id="voice" placeholder="e.g. alloy">
+        </label>
+        <label>Language
+          <input type="text" id="language" list="languages" placeholder="optional, e.g. en">
+          <datalist id="languages">
+            <option value="en"><option value="de"><option value="fr"><option value="es">
+            <option value="it"><option value="nl"><option value="pt"><option value="pl">
+            <option value="tr"><option value="ar">
+          </datalist>
+        </label>
+        <label>Speed
+          <input type="text" id="speed" placeholder="normal">
+        </label>
+        <label>Format
+          <select id="format"></select>
+        </label>
+      </div>
+      <button id="preview">Preview voice</button>
+      <span id="preview-note" class="muted"></span>
+      <audio id="preview-audio" hidden></audio>
+    </section>
+
+    <section class="card">
+      <div class="tabs">
+        <button id="tab-text" class="tab active">Enter text</button>
+        <button id="tab-file" class="tab">Upload file</button>
+      </div>
+
+      <div id="pane-text">
+        <label for="text" class="sr-only">Text to read aloud</label>
+        <textarea id="text" rows="12" placeholder="Type or paste text here…"></textarea>
+        <div class="count"><span id="count" class="muted"></span></div>
+      </div>
+
+      <div id="pane-file" hidden>
+        <label id="drop" class="drop">
+          <input type="file" id="file" hidden>
+          <strong>Drop a document here or click to browse</strong>
+          <span id="extensions" class="muted"></span>
+        </label>
+        <p id="chosen" class="muted" hidden></p>
+      </div>
+
+      <div class="row">
+        <button id="submit" class="primary">Create audio</button>
+        <span id="progress" class="muted" hidden></span>
+      </div>
+      <p id="error" class="error" hidden></p>
+    </section>
+
+    <section id="result" class="card" hidden>
+      <h2>Audio ready</h2>
+      <p id="result-name" class="muted"></p>
+      <audio id="audio" controls></audio>
+      <div class="row">
+        <a id="download" class="button primary" download>Download</a>
+        <button id="again">New audio</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Server</h2>
+      <p class="muted">Settings come from the environment. Fields left empty keep the value the server was started with.</p>
+      <div class="options">
+        <label class="wide">Base URL
+          <input type="text" id="base-url" placeholder="http://localhost:11434/v1">
+        </label>
+        <label class="wide">Model
+          <input type="text" id="model" placeholder="your-speech-model">
+        </label>
+        <label class="wide">API key
+          <input type="password" id="api-key" placeholder="only if the server needs one">
+        </label>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

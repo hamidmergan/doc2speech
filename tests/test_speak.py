@@ -83,6 +83,15 @@ def test_parts_are_joined_with_ffmpeg(server, conf, tmp_path, fmt):
     assert 4 * single <= _duration(target) <= 4 * single + 0.25
 
 
+def test_progress_counts_the_finished_parts(server, conf, monkeypatch):
+    monkeypatch.setattr("doc2speech.core.join", lambda parts, fmt: b"joined")
+    monkeypatch.setattr("doc2speech.core.ffmpeg_path", lambda: "ffmpeg")
+    seen = []
+    speak(LONG, progress=lambda done, total: seen.append((done, total)), **conf)
+    assert seen[0] == (0, 4)
+    assert sorted(seen) == [(0, 4), (1, 4), (2, 4), (3, 4), (4, 4)]
+
+
 @needs_ffmpeg
 def test_broken_parts_raise_audio_error(monkeypatch, conf, server):
     monkeypatch.setattr("doc2speech.core.synthesize_chunk", lambda c, s, t: b"not audio")

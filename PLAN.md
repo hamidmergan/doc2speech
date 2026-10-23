@@ -14,6 +14,7 @@ Shape: Python library with a thin CLI and a small web UI. pip package `doc2speec
 - Numbers are spelled out for English only (`language` en, en-US, ...). Other languages stay unchanged, because the wrong reading of digits was only measured for English. Without a language nothing is changed.
 - Speed is optional and only sent when set. Without it the request carries no speed field, because some servers slow a voice down with an audible echo.
 - Text files: .txt, .md, .docx, .pdf (text layer), plus .tex, .srt and .vtt which need no extra dependency. Markdown, LaTeX and subtitle markup is stripped before speaking.
+- `speak`, `speak_file` and `file_audio` take an optional `progress(done, total)` callback. The web page uses it to show which part is being spoken.
 - Public API: `speak(text, voice, base_url, model, api_key=None, **settings) -> bytes`, `speak_file(path, output=None, voice, ...) -> Path`, `split_text(text, max_chars=None) -> list`, plus `preview`, `extract_text`, `spell_numbers`. Further settings are keyword arguments.
 - The voice has no default. It is required by argument, `--voice` or `DOC2SPEECH_VOICE`, together with base_url and model.
 - CLI: a file or `--text`, not both. `--preview` speaks the example sentence. `-o -` writes to stdout. Generated output names never overwrite (`notes (1).mp3`), an explicit `-o` does. Exit code 2 for configuration errors, 1 for other errors.
@@ -29,9 +30,11 @@ Shape: Python library with a thin CLI and a small web UI. pip package `doc2speec
 - [x] 3 Tests with a fake server: splitting, number words (de and en), joining, CLI, missing configuration.
 - [x] 4 README, CHANGELOG 0.1.0, local smoke test with a real speech model.
 - [x] 5 English sweep, acceptance greps.
-- [ ] 6 Web UI (`doc2speech serve`) and Docker.
+- [x] 6 Web UI (`doc2speech serve`) and Docker.
 
 ## Open
 
+- Web page: one job at a time, held in memory, nothing written to disk. Text or one uploaded file (max 25 MB), voice preview, audio player and download. Settings come from the environment and can be overwritten in the fields of the page. Host and origin guard like the other tools, no login.
+- Docker image brings ffmpeg and starts the page on port 8000. `DOC2SPEECH_PORT` moves the published port if 8000 is taken.
 - Smoke test with a real speech model: a 1,248 character text went out in four parts and came back as one 86 second mp3. Preview and wav also work.
 - Possible extras later: speech providers with their own protocol instead of the OpenAI-compatible endpoint.

@@ -179,21 +179,35 @@ def supported_suffixes() -> List[str]:
     return sorted(EXTRACTORS)
 
 
+def _extractor(suffix: str) -> Callable[[Source], str]:
+    found = EXTRACTORS.get(suffix)
+    if found is None:
+        raise UnsupportedFileError(
+            f"File type {suffix or '(no extension)'} is not supported. "
+            f"Allowed: {', '.join(supported_suffixes())}"
+        )
+    return found
+
+
+def _run(extractor: Callable[[Source], str], source: Source, name: str) -> str:
+    try:
+        return extractor(source)
+    except UnicodeDecodeError:
+        raise UnsupportedFileError(f"{name} is not UTF-8 text.")
+    except Exception as exc:
+        raise UnsupportedFileError(f"{name} cannot be read: {exc}")
+
+
 def extract_text(path: Union[str, Path]) -> str:
     """Read the text of a supported file."""
     path = Path(path)
     if not path.is_file():
         raise UnsupportedFileError(f"File not found: {path}")
     suffix = path.suffix.lower()
-    extractor = EXTRACTORS.get(suffix)
-    if extractor is None:
-        raise UnsupportedFileError(
-            f"File type {suffix or '(no extension)'} is not supported. "
-            f"Allowed: {', '.join(supported_suffixes())}"
-        )
-    try:
-        return extractor(path)
-    except UnicodeDecodeError:
-        raise UnsupportedFileError(f"{path.name} is not UTF-8 text.")
-    except Exception as exc:
-        raise UnsupportedFileError(f"{path.name} cannot be read: {exc}")
+    return _run(_extractor(suffix), path, path.name)
+
+
+def extract_bytes(name: str, data: bytes) -> str:
+    """Read the text of an uploaded file, the type comes from its name."""
+    suffix = Path(name).suffix.lower()
+    return _run(_extractor(suffix), data, Path(name).name or "the file")
