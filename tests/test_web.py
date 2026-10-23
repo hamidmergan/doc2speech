@@ -1,5 +1,6 @@
 """The web page and its JSON API, against the fake speech server."""
 
+import threading
 import time
 
 import pytest
@@ -117,6 +118,23 @@ def test_a_server_error_ends_the_job(client, server):
     assert job["state"] == "error"
     assert "failed" in job["error"]
     assert client.get("/api/audio").status_code == 404
+
+
+def test_a_second_text_is_refused_while_one_is_running(client, monkeypatch):
+    """The page works on one job at a time."""
+    gate = threading.Event()
+
+    def wait(text, **kwargs):
+        gate.wait(5)
+        return SAMPLES["mp3"]
+
+    monkeypatch.setattr("doc2speech.web.app.speak", wait)
+    assert client.post("/api/speak", data={"text": "First."}).status_code == 200
+    second = client.post("/api/speak", data={"text": "Second."})
+    assert second.status_code == 409
+    assert "already being read aloud" in second.json()["detail"]
+    gate.set()
+    assert finish(client)["state"] == "done"
 
 
 def test_an_unexpected_error_ends_the_job_and_frees_the_page(client, monkeypatch):
