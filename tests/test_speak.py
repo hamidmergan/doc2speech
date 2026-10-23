@@ -99,6 +99,36 @@ def test_broken_parts_raise_audio_error(monkeypatch, conf, server):
         speak(LONG, **conf)
 
 
+def test_an_ffmpeg_timeout_becomes_an_audio_error(monkeypatch, conf, server):
+    """Everything that leaves speak is a SpeechError, the CLI and the page rely on it."""
+    def slow(*args, **kwargs):
+        raise subprocess.TimeoutExpired(cmd="ffmpeg", timeout=600)
+
+    monkeypatch.setattr("doc2speech.core.ffmpeg_path", lambda: "ffmpeg")
+    monkeypatch.setattr("doc2speech.audio.ffmpeg_path", lambda: "ffmpeg")
+    monkeypatch.setattr(subprocess, "run", slow)
+    with pytest.raises(AudioError, match="did not finish"):
+        speak(LONG, **conf)
+
+
+def test_an_unusable_temp_directory_becomes_an_audio_error(monkeypatch, conf, server):
+    def refused(*args, **kwargs):
+        raise PermissionError("read-only file system")
+
+    monkeypatch.setattr("doc2speech.core.ffmpeg_path", lambda: "ffmpeg")
+    monkeypatch.setattr("doc2speech.audio.ffmpeg_path", lambda: "ffmpeg")
+    monkeypatch.setattr("doc2speech.audio.tempfile.TemporaryDirectory", refused)
+    with pytest.raises(AudioError, match="temporary"):
+        speak(LONG, **conf)
+
+
+def test_an_unwritable_output_becomes_an_audio_error(server, conf, tmp_path):
+    source = tmp_path / "notes.txt"
+    source.write_text("Hello from a file.", encoding="utf-8")
+    with pytest.raises(AudioError, match="could not be written"):
+        speak_file(source, tmp_path / "missing" / "out.mp3", **conf)
+
+
 def test_empty_text(server, conf):
     with pytest.raises(EmptyTextError, match="Please enter some text"):
         speak("  \n\t ", **conf)

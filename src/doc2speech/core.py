@@ -8,7 +8,7 @@ from . import config
 from .audio import SUFFIXES, ffmpeg_path, join
 from .chunking import split_text
 from .client import make_client, synthesize_chunk
-from .errors import EmptyTextError, LimitError
+from .errors import AudioError, EmptyTextError, LimitError
 from .extract import extract_text, sanitize_text
 from .numbers import language_code
 from .preview import preview_text
@@ -110,7 +110,10 @@ def speak_file(
     path = Path(path)
     audio = file_audio(path, resolved, client, progress)
     target = Path(output) if output is not None else path.with_suffix(SUFFIXES[resolved.format])
-    target.write_bytes(audio)
+    try:
+        target.write_bytes(audio)
+    except OSError as exc:
+        raise AudioError(f"The audio could not be written to {target}: {exc}")
     return target
 
 

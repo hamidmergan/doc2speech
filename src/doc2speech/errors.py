@@ -23,4 +23,4 @@ class ModelError(SpeechError):
 
 
 class AudioError(SpeechError):
-    """ffmpeg is missing or could not join the audio parts."""
+    """ffmpeg is missing, the parts could not be joined, or the audio could not be written."""
