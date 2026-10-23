@@ -28,8 +28,9 @@ def language_code(language: Optional[str]) -> str:
 def _as_words(raw: str, lang: str) -> str:
     from num2words import num2words
 
+    # A comma groups the thousands. A dot is the decimal point, never a group,
+    # because digits are only spelled out for English.
     text = raw.replace(",", "") if re.fullmatch(r"\d{1,3}(?:,\d{3})+", raw) else raw
-    text = text.replace(".", "") if re.fullmatch(r"\d{1,3}(?:\.\d{3})+", raw) else text
     number = float(text) if "." in text else int(text)
     if isinstance(number, int) and _YEAR_FROM <= number <= _YEAR_TO and len(raw) == 4:
         return num2words(number, lang=lang, to="year")

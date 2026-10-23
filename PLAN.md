@@ -22,6 +22,10 @@ Shape: Python library with a thin CLI and a small web UI. pip package `doc2speec
 - Preview sentence for a voice in English and German, German for any other language.
 - Not carried: provider catalog, default voice selection across several providers, voice fallback between providers, preview cache, job storage, resume of half-finished jobs, quotas. With one configured server these have no role. The voice is set per call and used for every part, so one output never mixes two voices.
 
+## Deliberate deviations from the source
+
+- A dot in an English number is read as a decimal point, not as a thousands separator. The source stripped a dot from patterns like `3.141` and spoke "three thousand, one hundred and forty-one". Numbers are only spelled out for English (`_MEASURED_LANGUAGES = {"en"}`), and in English a dot is the decimal point, so that branch could only ever corrupt a number. The comma branch still covers English thousands (`1,000`).
+
 ## Checklist
 
 - [x] 0 Scaffold: repo, LICENSE (MIT), pyproject, package, tests, CI, PLAN.md, README skeleton, ffmpeg check.

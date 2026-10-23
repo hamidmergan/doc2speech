@@ -18,6 +18,16 @@ def test_english_numbers_are_spelled_out(raw, expected):
     assert spell_numbers(raw, "EN") == expected
 
 
+@pytest.mark.parametrize("raw, expected", [
+    ("The value of pi is 3.141.", "The value of pi is three point one four one."),
+    ("Version 2.718 of the library.", "Version two point seven one eight of the library."),
+    ("He ran 10.500 meters.", "He ran ten point five meters."),
+])
+def test_a_dot_is_a_decimal_point_in_english(raw, expected):
+    """In English a dot separates the decimals, it is not a thousands separator."""
+    assert spell_numbers(raw, "EN") == expected
+
+
 @pytest.mark.parametrize("language", ["DE", "de", "de-DE", "FR", "TR", "ES"])
 def test_other_languages_stay_untouched(language):
     """Measured for English only, German and every other language stay as they are."""
