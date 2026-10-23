@@ -116,6 +116,8 @@ The public API is small and stable, so other tools can build on it:
 | `extract_text(path)` | the text of a file as `str` |
 | `spell_numbers(text, language)` | the text with numbers as words |
 
+`split_text` returns exactly the parts `speak` would send. Without `max_chars` it takes the limit from `DOC2SPEECH_MAX_CHARS_PER_CHUNK`, otherwise 400, so a part count shown before a run matches the run.
+
 Every setting from the table below can be passed to `speak`, `speak_file` and `preview` as a keyword argument. Errors are raised as subclasses of `SpeechError`: `ConfigError`, `LimitError`, `EmptyTextError`, `UnsupportedFileError`, `ModelError` and `AudioError`.
 
 ### Settings

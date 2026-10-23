@@ -71,6 +71,15 @@ def _pick(arg, env_name: str, default, cast):
         )
 
 
+def chunk_limit(max_chars_per_chunk: Optional[int] = None) -> int:
+    """Characters per speech request: argument, then environment, then default.
+
+    `split_text` and `resolve` both go through this, so a loose call to
+    `split_text` splits a text into the same parts as `speak` does.
+    """
+    return _pick(max_chars_per_chunk, "MAX_CHARS_PER_CHUNK", MAX_CHARS_PER_CHUNK, int)
+
+
 def resolve(
     *,
     base_url: Optional[str] = None,
@@ -115,9 +124,7 @@ def resolve(
         speed=_pick(speed, "SPEED", None, float),
         format=str(_pick(format, "FORMAT", FORMAT, str)).lower(),
         language=_pick(language, "LANGUAGE", "", str),
-        max_chars_per_chunk=_pick(
-            max_chars_per_chunk, "MAX_CHARS_PER_CHUNK", MAX_CHARS_PER_CHUNK, int
-        ),
+        max_chars_per_chunk=chunk_limit(max_chars_per_chunk),
         max_chars=_pick(max_chars, "MAX_CHARS", MAX_CHARS, int),
         concurrency=_pick(concurrency, "CONCURRENCY", CONCURRENCY, int),
         timeout=_pick(timeout, "TIMEOUT", TIMEOUT_SECONDS, float),

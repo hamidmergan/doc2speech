@@ -2,7 +2,7 @@
 
 from typing import List, Optional
 
-from .config import MAX_CHARS_PER_CHUNK
+from .config import chunk_limit
 
 # From which share of the ceiling on a sentence end is looked for.
 _SEARCH_FROM = 0.6
@@ -14,9 +14,11 @@ def split_text(text: str, max_chars: Optional[int] = None) -> List[str]:
     """Split long text, preferably at sentence ends, otherwise at word boundaries.
 
     Joining the parts gives back the original text exactly. No part is longer
-    than max_chars (default 400).
+    than max_chars. Without max_chars the limit comes from
+    DOC2SPEECH_MAX_CHARS_PER_CHUNK, otherwise it is 400, so the parts are the
+    ones `speak` would send.
     """
-    limit = max_chars or MAX_CHARS_PER_CHUNK
+    limit = max_chars or chunk_limit()
     if len(text) <= limit:
         return [text]
 

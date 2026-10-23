@@ -18,6 +18,22 @@ def test_script_length_text_is_split():
     assert all(len(c) <= MAX_CHARS_PER_CHUNK for c in chunks)
 
 
+def test_the_environment_sets_the_default_limit(monkeypatch):
+    """split_text and speak have to agree on the limit, both read the environment."""
+    script = "This is a sentence about academic writing and research. " * 35
+    monkeypatch.setenv("DOC2SPEECH_MAX_CHARS_PER_CHUNK", "150")
+    chunks = split_text(script)
+    assert all(len(c) <= 150 for c in chunks)
+    assert len(chunks) > len(split_text(script, MAX_CHARS_PER_CHUNK))
+
+
+def test_an_argument_wins_over_the_environment(monkeypatch):
+    script = "This is a sentence about academic writing and research. " * 35
+    monkeypatch.setenv("DOC2SPEECH_MAX_CHARS_PER_CHUNK", "150")
+    chunks = split_text(script, 400)
+    assert max(len(c) for c in chunks) > 150
+
+
 def test_nothing_is_lost_or_duplicated():
     script = "First sentence. Second sentence! Third sentence? " * 40
     assert "".join(split_text(script)) == script
