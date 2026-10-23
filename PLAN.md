@@ -13,6 +13,10 @@ Shape: Python library with a thin CLI and a small web UI. pip package `doc2speec
 - Numbers are spelled out for English only (`language` en, en-US, ...). Other languages stay unchanged, because the wrong reading of digits was only measured for English. Without a language nothing is changed.
 - Speed is optional and only sent when set. Without it the request carries no speed field, because some servers slow a voice down with an audible echo.
 - Text files: .txt, .md, .docx, .pdf (text layer), plus .tex, .srt and .vtt which need no extra dependency. Markdown, LaTeX and subtitle markup is stripped before speaking.
+- Public API: `speak(text, voice, base_url, model, api_key=None, **settings) -> bytes`, `speak_file(path, output=None, voice, ...) -> Path`, `split_text(text, max_chars=None) -> list`, plus `preview`, `extract_text`, `spell_numbers`. Further settings are keyword arguments.
+- The voice has no default. It is required by argument, `--voice` or `DOC2SPEECH_VOICE`, together with base_url and model.
+- CLI: a file or `--text`, not both. `--preview` speaks the example sentence. `-o -` writes to stdout. Generated output names never overwrite (`notes (1).mp3`), an explicit `-o` does. Exit code 2 for configuration errors, 1 for other errors.
+- Limits messages follow the original wording: "Text too long (... characters). Please shorten (max ... characters)." and "Document too long ... Please split ...".
 - Preview sentence for a voice in English and German, German for any other language.
 - Not carried: provider catalog, default voice selection across several providers, voice fallback between providers, preview cache, job storage, resume of half-finished jobs, quotas. With one configured server these have no role. The voice is set per call and used for every part, so one output never mixes two voices.
 
@@ -20,7 +24,7 @@ Shape: Python library with a thin CLI and a small web UI. pip package `doc2speec
 
 - [x] 0 Scaffold: repo, LICENSE (MIT), pyproject, package, tests, CI, PLAN.md, README skeleton, ffmpeg check.
 - [x] 1 Core: client, chunking, number words, joining with ffmpeg (concat demuxer), text extraction, `config.py`, `errors.py`.
-- [ ] 2 API + CLI: `speak`, `speak_file`, `split_text`, CLI with `--voice`, `--text`, `--speed`, `--format`.
+- [x] 2 API + CLI: `speak`, `speak_file`, `split_text`, CLI with `--voice`, `--text`, `--speed`, `--format`.
 - [ ] 3 Tests with a fake server: splitting, number words (de and en), joining, CLI, missing configuration.
 - [ ] 4 README, CHANGELOG 0.1.0, local smoke test with a real speech model.
 - [ ] 5 English sweep, acceptance greps.

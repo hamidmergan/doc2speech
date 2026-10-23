@@ -98,7 +98,7 @@ def resolve(
         missing.append("voice (--voice or DOC2SPEECH_VOICE)")
     if missing:
         raise ConfigError(
-            "Missing: " + " and ".join(missing) + ". "
+            "Missing: " + ", ".join(missing) + ". "
             "Example for a local server: base_url http://localhost:11434/v1, "
             "a text-to-speech model and one of its voices."
         )
